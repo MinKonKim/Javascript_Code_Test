@@ -11,7 +11,7 @@ int solution(vector<int> citations) {
 
 	for (int i = 0; i < citations.size(); i++)
 	{
-		int H_idx = citations.size() - i;
+		int H_idx = citations.size() - i; // 5 4 3 2 1
 		if (H_idx <= citations[i])return H_idx;
 	}
 
