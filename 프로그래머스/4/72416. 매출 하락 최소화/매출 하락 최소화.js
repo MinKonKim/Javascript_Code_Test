@@ -33,34 +33,33 @@ function solution(sales, links) {
         }
         // 현재 직원이 워크샵에 불참하는 경우
         else {
-            let totalCost = 0;
-            let mustAttend = false;
-            let minDiff = Infinity;
+            let minTotalCost = Infinity;
+            const teamSize = teams[node].length;
             
-            // 각 팀원별로 참석/불참 비용 계산
-            for (const member of teams[node]) {
-                const notAttend = dfs(member, 0);
-                const attend = dfs(member, 1);
-                // 최소 비용 선택
-                if (notAttend < attend) {
-                    totalCost += notAttend;
-                    // 참석/불참 비용의 차이 계산
-                    minDiff = Math.min(minDiff, attend - notAttend);
-                } else {
-                    totalCost += attend;
-                    mustAttend = true;
+            // 모든 가능한 팀원 참석 조합을 확인
+            // 비트마스크를 사용하여 모든 조합 생성
+            for (let mask = 0; mask < (1 << teamSize); mask++) {
+                let currentCost = 0;
+                let hasAttendee = false;
+                
+                // 각 팀원에 대해 참석 여부 결정
+                for (let i = 0; i < teamSize; i++) {
+                    const member = teams[node][i];
+                    if (mask & (1 << i)) { // 참석하는 경우
+                        currentCost += dfs(member, 1);
+                        hasAttendee = true;
+                    } else { // 불참하는 경우
+                        currentCost += dfs(member, 0);
+                    }
+                }
+                
+                // 적어도 한 명이 참석한 경우에만 최소 비용 업데이트
+                if (hasAttendee) {
+                    minTotalCost = Math.min(minTotalCost, currentCost);
                 }
             }
             
-            // 팀원 중 아무도 참석하지 않는 경우, 가장 적은 비용으로 한 명을 참석시킴
-            if (!mustAttend) {
-                if (minDiff === Infinity) {
-                    minDiff = 0;
-                }
-                totalCost += minDiff;
-            }
-            
-            dp[node][0] = totalCost;
+            dp[node][0] = minTotalCost;
         }
         
         return dp[node][attend];
